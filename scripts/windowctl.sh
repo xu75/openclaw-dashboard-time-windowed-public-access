@@ -139,9 +139,15 @@ cancel_pending_close() {
 
 schedule_close_systemd() {
   local minutes="$1"
-  local seconds=$((minutes * 60))
-  local due_epoch=$(( $(date +%s) + seconds ))
-  local unit="${SYSTEMD_UNIT_PREFIX}-$(date +%s)-$$"
+  local seconds
+  local now_epoch
+  local due_epoch
+  local unit
+
+  seconds=$((minutes * 60))
+  now_epoch="$(date +%s)"
+  due_epoch=$((now_epoch + seconds))
+  unit="${SYSTEMD_UNIT_PREFIX}-${now_epoch}-$$"
 
   systemd-run --quiet \
     --unit "${unit}" \
@@ -163,8 +169,13 @@ schedule_close_systemd() {
 
 schedule_close_nohup() {
   local minutes="$1"
-  local seconds=$((minutes * 60))
-  local due_epoch=$(( $(date +%s) + seconds ))
+  local seconds
+  local now_epoch
+  local due_epoch
+
+  seconds=$((minutes * 60))
+  now_epoch="$(date +%s)"
+  due_epoch=$((now_epoch + seconds))
 
   nohup /bin/bash -c "sleep ${seconds}; /usr/bin/env STATE_DIR='${STATE_DIR}' WINDOW_CONF='${WINDOW_CONF}' WINDOW_OPEN_CONF='${WINDOW_OPEN_CONF}' WINDOW_CLOSED_CONF='${WINDOW_CLOSED_CONF}' META_FILE='${META_FILE}' LOCK_FILE='${LOCK_FILE}' NGINX_BIN='${NGINX_BIN}' SYSTEMD_UNIT_PREFIX='${SYSTEMD_UNIT_PREFIX}' NOHUP_LOG='${NOHUP_LOG}' '${SCRIPT_PATH}' close >>'${NOHUP_LOG}' 2>&1" >/dev/null 2>&1 &
   local pid=$!
