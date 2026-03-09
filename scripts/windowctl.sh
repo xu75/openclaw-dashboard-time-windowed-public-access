@@ -125,7 +125,8 @@ cancel_pending_close() {
 
   if [[ "${META_SCHEDULER}" == "systemd" && -n "${META_UNIT}" ]]; then
     if command -v systemctl >/dev/null 2>&1; then
-      systemctl stop "${META_UNIT}.timer" "${META_UNIT}.service" >/dev/null 2>&1 || true
+      # Stop timer only. Stopping the current service can interrupt metadata cleanup.
+      systemctl stop "${META_UNIT}.timer" >/dev/null 2>&1 || true
       systemctl reset-failed "${META_UNIT}.service" >/dev/null 2>&1 || true
     fi
   fi
