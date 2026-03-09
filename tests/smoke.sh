@@ -45,9 +45,9 @@ echo "[STEP] with basic auth should reach upstream (not 401/403 from nginx gate)
 code_with_auth="$(http_code "${BASE_URL}/openclaw/" -u "${BASIC_USER}:${BASIC_PASS}")"
 [[ "${code_with_auth}" != "401" && "${code_with_auth}" != "403" ]] || fail "Expected upstream reachable, got ${code_with_auth}"
 
-echo "[STEP] minutes > 60 must fail"
-if sudo "${WINDOWCTL_BIN}" open --minutes 61 >/dev/null 2>&1; then
-  fail "open --minutes 61 should fail"
+echo "[STEP] minutes > 240 must fail"
+if sudo "${WINDOWCTL_BIN}" open --minutes 241 >/dev/null 2>&1; then
+  fail "open --minutes 241 should fail"
 fi
 
 echo "[STEP] wait for auto close (65s)"

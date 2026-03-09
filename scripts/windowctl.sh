@@ -20,7 +20,7 @@ fi
 usage() {
   cat <<USAGE
 Usage:
-  $0 open [--minutes <1-60>]
+  $0 open [--minutes <1-240>]
   $0 close
   $0 status
 USAGE
@@ -223,11 +223,11 @@ apply_window_conf() {
 validate_minutes() {
   local minutes="$1"
   if [[ ! "${minutes}" =~ ^[0-9]+$ ]]; then
-    echo "[ERROR] --minutes must be an integer between 1 and 60." >&2
+    echo "[ERROR] --minutes must be an integer between 1 and 240." >&2
     exit 1
   fi
-  if (( minutes < 1 || minutes > 60 )); then
-    echo "[ERROR] --minutes must be in range 1..60." >&2
+  if (( minutes < 1 || minutes > 240 )); then
+    echo "[ERROR] --minutes must be in range 1..240." >&2
     exit 1
   fi
 }
