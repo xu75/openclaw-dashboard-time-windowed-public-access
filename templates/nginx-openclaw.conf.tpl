@@ -28,8 +28,45 @@ server {
   ssl_certificate __SSL_CERT_PATH__;
   ssl_certificate_key __SSL_KEY_PATH__;
 
+  # Important: dashboard websocket uses /openclaw (without trailing slash),
+  # so do not redirect this endpoint.
   location = /openclaw {
-    return 301 /openclaw/;
+    include __WINDOW_CONF_PATH__;
+
+    auth_basic "Restricted OpenClaw Dashboard";
+    auth_basic_user_file __BASIC_AUTH_FILE__;
+
+    proxy_pass http://127.0.0.1:18789/openclaw;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_read_timeout 120s;
+    proxy_send_timeout 120s;
+  }
+
+  # Runtime config is requested under /openclaw/__openclaw/*
+  # while upstream serves it under /__openclaw/*.
+  location ^~ /openclaw/__openclaw/ {
+    include __WINDOW_CONF_PATH__;
+
+    auth_basic "Restricted OpenClaw Dashboard";
+    auth_basic_user_file __BASIC_AUTH_FILE__;
+
+    rewrite ^/openclaw(/__openclaw/.*)$ $1 break;
+    proxy_pass http://127.0.0.1:18789;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_read_timeout 120s;
+    proxy_send_timeout 120s;
   }
 
   location ^~ /openclaw/ {
@@ -40,6 +77,8 @@ server {
 
     proxy_pass http://127.0.0.1:18789;
     proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

@@ -45,6 +45,15 @@ echo "[STEP] with basic auth should reach upstream (not 401/403 from nginx gate)
 code_with_auth="$(http_code "${BASE_URL}/openclaw/" -u "${BASIC_USER}:${BASIC_PASS}")"
 [[ "${code_with_auth}" != "401" && "${code_with_auth}" != "403" ]] || fail "Expected upstream reachable, got ${code_with_auth}"
 
+echo "[STEP] websocket upgrade on /openclaw should work"
+ws_code="$(http_code "${BASE_URL}/openclaw" \
+  -u "${BASIC_USER}:${BASIC_PASS}" \
+  -H "Connection: Upgrade" \
+  -H "Upgrade: websocket" \
+  -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+  -H "Sec-WebSocket-Version: 13")"
+[[ "${ws_code}" == "101" ]] || fail "Expected websocket 101 on /openclaw, got ${ws_code}"
+
 echo "[STEP] minutes > 240 must fail"
 if sudo "${WINDOWCTL_BIN}" open --minutes 241 >/dev/null 2>&1; then
   fail "open --minutes 241 should fail"

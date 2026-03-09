@@ -176,6 +176,7 @@ sudo ./scripts/uninstall.sh
 - `open` 后无自动回收：检查 `status` 输出的自动任务信息与系统日志。
 - `systemd-run` 不可用：脚本会自动降级到 `nohup + sleep`。
 - BasicAuth 通过但页面异常：排查本机 `127.0.0.1:18789` 上游服务状态。
+- 页面显示 `disconnected (1006)`：确认使用最新模板（`/openclaw` 不再 301，且已设置 WebSocket Upgrade 头）。
 
 ## Audit
 
