@@ -120,6 +120,18 @@ setup_basic_auth() {
   hash="$(openssl passwd -apr1 "${BASIC_PASS}")"
   umask 027
   printf '%s:%s\n' "${BASIC_USER}" "${hash}" > "${BASIC_AUTH_FILE}"
+
+  # Let nginx worker read htpasswd while keeping it non-world-readable when possible.
+  if getent group nginx >/dev/null 2>&1; then
+    chown root:nginx "${BASIC_AUTH_FILE}"
+    chmod 640 "${BASIC_AUTH_FILE}"
+  elif getent group www-data >/dev/null 2>&1; then
+    chown root:www-data "${BASIC_AUTH_FILE}"
+    chmod 640 "${BASIC_AUTH_FILE}"
+  else
+    chown root:root "${BASIC_AUTH_FILE}"
+    chmod 644 "${BASIC_AUTH_FILE}"
+  fi
 }
 
 install_window_files() {

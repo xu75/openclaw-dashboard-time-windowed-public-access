@@ -95,6 +95,30 @@ sudo /usr/local/sbin/openclaw-windowctl open --minutes 10
 sudo /usr/local/sbin/openclaw-windowctl close
 ```
 
+### No Domain Fallback
+
+如果当前没有可用公网域名，可以先用隔离主机名 `openclaw.local` + 自签证书部署（不影响现有 `server_name _` 业务）：
+
+```bash
+sudo mkdir -p /etc/nginx/openclaw/tls
+sudo openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
+  -subj "/CN=openclaw.local" \
+  -keyout /etc/nginx/openclaw/tls/openclaw.local.key \
+  -out /etc/nginx/openclaw/tls/openclaw.local.crt
+
+sudo BASIC_PASS='<BASIC_PASS_PLACEHOLDER>' bash ./scripts/bootstrap.sh \
+  --domain openclaw.local \
+  --cert /etc/nginx/openclaw/tls/openclaw.local.crt \
+  --key /etc/nginx/openclaw/tls/openclaw.local.key \
+  --basic-user <BASIC_USER_PLACEHOLDER>
+```
+
+访问端临时加 hosts：
+
+```text
+<SERVER_IP_PLACEHOLDER> openclaw.local
+```
+
 ## Validation / Acceptance
 
 1. 部署后初始状态必须是 `CLOSED`：
