@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# editors
+*.swp
+*.swo
+
+# logs
+*.log
+
+# env
+.env
+.env.*

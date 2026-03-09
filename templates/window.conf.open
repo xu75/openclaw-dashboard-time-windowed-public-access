@@ -1,0 +1,3 @@
+# OPEN window: allow all, but still requires BasicAuth in nginx config.
+satisfy all;
+allow all;
